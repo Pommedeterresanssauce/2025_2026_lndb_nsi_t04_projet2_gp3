@@ -1,12 +1,16 @@
 import pygame
 import pygame, sys
+from table import *
+from settings import *
 
 class Simulation :
     def __init__(self) :
         pygame.init()
-        self.screen = pygame.display.set_mode((1500, 850))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Poker 2")
         self.clock = pygame.time.Clock()
+        
+        self.table = Table()
 
     def run(self) :
         while True :
@@ -17,6 +21,7 @@ class Simulation :
                     pygame.quit()
                     sys.exit()
 
+            self.table.update()
             pygame.display.update()
 
 if __name__ == "__main__" :
