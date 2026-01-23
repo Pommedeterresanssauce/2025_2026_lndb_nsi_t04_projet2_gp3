@@ -17,8 +17,34 @@ def combinations(hand, table) :
 
     cards = represent_cards(hand, table)
 
+    if is_royal_flush(cards) :
+        return 9
+
+    if is_straight_flush(cards) :
+        return 8
+
+    if is_four_of_k(cards) :
+        return 7
+
+    if is_full_house(cards) :
+        return 6
+
+    if is_flush(cards) :
+        return 5
+
+    if is_straight(cards) :
+        return 4
+
+    if is_three_of_k(cards) :
+        return 3
+
+    if is_two_pair(cards) :
+        return 2
+
     if is_pair(cards) :
-        return "pair"
+        return 1
+    
+    return high_card(cards)
 
 def is_pair(cards) :
     for i in range(13) :
@@ -107,3 +133,8 @@ def is_royal_flush(cards) :
             return True
         
     return False
+
+def high_card(cards) :
+    for i in range(13) :
+        if cards["p"][13 - i] + cards["c"][13 - i] + cards["t"][13 - i] + cards["k"][13 - i] > 0:
+            return (i * 0.0099999)
