@@ -24,11 +24,18 @@ class Table :
             'shuffle' : [],
         }
         for animation in self.animations.keys() :
-            full_path = 'graphics/table_de_jeu/' + animation
+            full_path = 'graphics/animations/' + animation
             self.animations[animation] = import_folder(full_path)
+        self.animation_index = 0
+        
+        self.actual_animation = 'none'
+        
+        self.animations_pos = {
+            'shuffle' : (800, 150)
+        }
     
     
-    def update_turn(self) :
+    def update_turn_phase(self) :
         pass
     
     
@@ -46,7 +53,7 @@ class Table :
     
     
     def update(self) :
-        self.update_turn()
+        self.update_turn_phase()
         self.draw()
         self.player.draw()
     
