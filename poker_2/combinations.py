@@ -138,3 +138,44 @@ def high_card(cards) :
     for i in range(13) :
         if cards["p"][13 - i] + cards["c"][13 - i] + cards["t"][13 - i] + cards["k"][13 - i] > 0:
             return (i * 0.0099999)
+        
+# COMBO SPECIAUX        
+        
+def is_67(cards) :
+    if cards["p"][5] + cards["c"][5] + cards["t"][5] + cards["k"][5] > 0 :
+        if cards["p"][6] + cards["c"][6] + cards["t"][6] + cards["k"][6] > 0 :
+            return True
+    
+    return False
+
+def is_curve(cards) :
+    in_a_row = 0
+    for i in range(13) :
+        count = 0
+        for j in cards :
+            count += cards[j][i]
+        if count > 0 :
+            in_a_row += 1
+            if in_a_row == 4 :
+                return True
+        else :
+            in_a_row = 0
+        
+    if in_a_row == 3 and cards["p"][0] + cards["c"][0] + cards["t"][0] + cards["k"][0] > 0 :
+        return True
+        
+    return False
+
+def is_double_triple(cards) :
+    if cards["p"][1] + cards["c"][1] + cards["t"][1] + cards["k"][1] > 1 :
+        if cards["p"][2] + cards["c"][2] + cards["t"][2] + cards["k"][2] > 2 :
+            return True
+    
+    return False
+
+def is_jackpot(cards) :
+    if cards["p"][6] + cards["c"][6] + cards["t"][6] + cards["k"][6] > 2 :
+        return True
+    
+    return False
+
