@@ -167,14 +167,14 @@ def is_curve(cards) :
     return False
 
 def is_double_triple(cards) :
-    if cards["p"][1] + cards["c"][1] + cards["t"][1] + cards["k"][1] > 1 :
-        if cards["p"][2] + cards["c"][2] + cards["t"][2] + cards["k"][2] > 2 :
+    if cards["p"][1] + cards["c"][1] + cards["t"][1] + cards["k"][1] == 2 :
+        if cards["p"][2] + cards["c"][2] + cards["t"][2] + cards["k"][2] == 3 :
             return True
     
     return False
 
 def is_jackpot(cards) :
-    if cards["p"][6] + cards["c"][6] + cards["t"][6] + cards["k"][6] > 2 :
+    if cards["p"][6] + cards["c"][6] + cards["t"][6] + cards["k"][6] == 3 :
         return True
     
     return False
