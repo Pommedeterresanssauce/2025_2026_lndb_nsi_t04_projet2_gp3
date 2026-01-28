@@ -9,11 +9,17 @@ class Table:
         self.screen = pygame.display.get_surface()
         self.screen_width, self.screen_height = self.screen.get_size()
 
-        # phase
+        # --- PHASE ---
         self.active_turn = 'shuffle'
-        self.shuffle_done = False  # <<< LE TRUC IMPORTANT
+        self.shuffle_done = False 
+        self.distribution_done = False
+        
+        # --- DECK COMPOSITION ---
+        self.deck_cards = [
+            
+        ]
 
-        # images
+        # --- IMAGES ---
         self.table_image = pygame.image.load(
             'graphics/table_de_jeu/table_verte.png'
         ).convert()
@@ -35,7 +41,7 @@ class Table:
             self.deck_image, (140, 252)
         )
 
-        # animations
+        # --- ANIMATIONS ---
         self.animations = {
             'shuffle': import_folder('graphics/animations/shuffle')
         }
@@ -50,6 +56,12 @@ class Table:
         }
 
 
+    def turn_action(self) :
+        if self.active_turn == 'distribution' : 
+            pass
+        
+
+
     def update_turn_phase(self):
         # lancer l'animation UNE SEULE FOIS
         if self.active_turn == 'shuffle' and not self.shuffle_done:
@@ -57,14 +69,19 @@ class Table:
                 self.animations_infos['shuffle']['index'] = 0
                 self.actual_animations.append('shuffle')
 
-        # quand l'animation est terminée
-        if self.active_turn == 'shuffle' and self.shuffle_done:
-            self.active_turn = '1'
-
-
+        # quand le mélange est terminé
+        if self.active_turn == 'shuffle' and self.shuffle_done :
+            self.active_turn = 'distribution'
+            
+        # quand la distribution est terminée
+        if self.active_turn == 'distribution' and self.distribution_done :
+            self.active_turn = 'player1'
+            
+            
+        
     def update_and_draw_animations(self, dt):
         for animation in self.actual_animations.copy():
-            self.animations_infos[animation]['index'] += dt * 10
+            self.animations_infos[animation]['index'] += dt * 11
             index = int(self.animations_infos[animation]['index'])
 
             if index >= len(self.animations[animation]):
@@ -87,6 +104,9 @@ class Table:
         self.screen.blit(self.white_rectangle_image, (792.5, 657))
         self.screen.blit(self.white_rectangle_image, (977.5, 657))
 
+
+            
+    def draw_cards(self) :
         # deck visible seulement après le mélange
         if self.shuffle_done:
             self.screen.blit(self.deck_image, (885, 150))
@@ -94,8 +114,10 @@ class Table:
 
     def update(self, dt):
         self.update_turn_phase()
+        self.turn_action()
         self.draw()
         self.update_and_draw_animations(dt)
+        self.draw_cards()
         self.player.draw()
 
 
