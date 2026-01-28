@@ -39,6 +39,9 @@ class Table:
 
         self.white_rectangle_image = pygame.image.load('graphics/table_de_jeu/rectangle_blanc.png').convert_alpha()
         self.white_rectangle_image = pygame.transform.scale(self.white_rectangle_image, (140, 192))
+        
+        self.back_image = pygame.image.load('graphics/table_de_jeu/back.png').convert_alpha()
+        self.back_image = pygame.transform.scale(self.back_image, (140, 192))
 
         self.deck_image = pygame.image.load('graphics/table_de_jeu/deck.png').convert_alpha()
         self.deck_image = pygame.transform.scale(self.deck_image, (140, 252))
@@ -58,8 +61,10 @@ class Table:
             },
             # distribution anim infos
             'distribution' : {
-                'card1_pos' : (0, 0),
-                'card2_pos' : (100, 100),
+                'card1_pos' : [885, 150],
+                'card2_pos' : [885, 150],
+                'card1_final_pos' : (800, 890),
+                'card2_final_pos' : (970, 890),
             }
         }
 
@@ -111,7 +116,22 @@ class Table:
             
     
     def update_and_draw_distribution_animation(self, dt) :
-        self.distribution_animation_done = True
+        # self.distribution_animation_done = True
+        if self.animations_infos['distribution']['card1_pos'][1] < self.animations_infos['distribution']['card1_final_pos'][1] :
+            # update card1
+            self.animations_infos['distribution']['card1_pos'][0] -= dt * 68
+            self.animations_infos['distribution']['card1_pos'][1] += dt * 592
+            #update card2
+            self.animations_infos['distribution']['card2_pos'][0] += dt * 68
+            self.animations_infos['distribution']['card2_pos'][1] += dt * 592
+            card1_pos = self.animations_infos['distribution']['card1_pos']
+            card2_pos = self.animations_infos['distribution']['card2_pos']
+        else :
+            card1_pos = self.animations_infos['distribution']['card1_pos']
+            card2_pos = self.animations_infos['distribution']['card2_pos']
+        
+        self.screen.blit(self.back_image, card1_pos)
+        self.screen.blit(self.back_image, card2_pos)
     
     
     def update_and_draw_frame_animation(self, animation, dt) :
