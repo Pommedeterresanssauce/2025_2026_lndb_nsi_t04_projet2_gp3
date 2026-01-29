@@ -4,7 +4,7 @@ from support import import_folder
 import random
 
 
-class Table:
+class Table :
     def __init__(self):
         self.player = Player()
         self.screen = pygame.display.get_surface()
@@ -31,7 +31,7 @@ class Table:
                                "k" : ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13']}
         for key, values in card_representation.items() :
             for value in values :
-                self.deck_cards.append(str(key + value))
+                self.deck_cards.append(str(value + key))
 
         # --- IMAGES ---
         self.table_image = pygame.image.load('graphics/table_de_jeu/table_verte.png').convert()
