@@ -7,8 +7,6 @@ class Player :
         # --- IMAGES ---
         self.card1_image = None
         self.card2_image = None
-        self.card1_dimension = [140, 192]
-        self.card2_dimension = [140, 192]
         self.card1_pos = [800, 890]
         self.card2_pos = [970, 890]
         
