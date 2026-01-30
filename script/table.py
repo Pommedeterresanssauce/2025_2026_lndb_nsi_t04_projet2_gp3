@@ -83,8 +83,9 @@ class Table :
         i = 0
         for player in self.players :
             player.hand = [self.deck_cards[i], self.deck_cards[i + 1]]
+            player.card1_image = self.card_images[self.deck_cards[i]]
+            player.card2_image = self.card_images[self.deck_cards[i + 1]]
             i += 2
-            print(player.hand)
         self.distribution_done = True
 
 
@@ -94,6 +95,9 @@ class Table :
             
         if self.active_turn == 'distribution' and not self.distribution_done : 
             self.distribute_cards()
+            
+        if self.active_turn == 'player1' :
+            self.player1.update()
             
             
     def update_turn_phase(self, dt) :
@@ -116,7 +120,7 @@ class Table :
         # quand la distribution est terminée
         if self.active_turn == 'distribution' and self.distribution_done and self.distribution_animation_done:
             self.active_turn = 'player1'
-            print('okk')
+            # print('okk')
             
     
     def update_and_draw_distribution_animation(self, dt) :
@@ -133,6 +137,9 @@ class Table :
         else :
             card1_pos = self.animations_infos['distribution']['card1_pos']
             card2_pos = self.animations_infos['distribution']['card2_pos']
+            self.distribution_animation_done = True
+            self.actual_animations.remove('distribution')
+            
         
         self.screen.blit(self.back_image, card1_pos)
         self.screen.blit(self.back_image, card2_pos)
@@ -183,8 +190,8 @@ class Table :
         self.draw()
         self.update_and_draw_animations(dt)
         self.draw_cards()
-        self.player.draw()
-
+        if 'player' in self.active_turn :
+            self.player1.draw(self.screen)
 
     
     
