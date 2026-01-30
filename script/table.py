@@ -5,7 +5,7 @@ import random
 
 
 class Table :
-    def __init__(self):
+    def __init__(self) :
         self.player = Player()
         self.screen = pygame.display.get_surface()
         self.screen_width, self.screen_height = self.screen.get_size()
@@ -32,6 +32,10 @@ class Table :
         for key, values in card_representation.items() :
             for value in values :
                 self.deck_cards.append(str(value + key))
+                
+        self.card_images = {}
+        for card in self.deck_cards :
+            self.card_images[card] = pygame.transform.scale(pygame.image.load(f'graphics/cartes/{card}.png').convert(), (140, 192))
 
         # --- IMAGES ---
         self.table_image = pygame.image.load('graphics/table_de_jeu/table_verte.png').convert()
