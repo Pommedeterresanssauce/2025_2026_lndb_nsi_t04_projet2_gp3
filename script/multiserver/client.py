@@ -32,8 +32,12 @@ class Player ():
             self.y -= self.vel 
         if key[pygame.K_DOWN] :
             self.y += self.vel 
-        self.rect = (self.x, self.y, self.width, self.height)
-                       
+        
+        self.update()
+    
+    def update(self):
+        self.rect = (self.x, self.y, self.widht, self.height)
+
             
 def read_pos(str) :
     str = str.splt(",")
@@ -60,6 +64,7 @@ def main():
         p2Pos = read_pos(n.send(make_pos((p.x, p.y))))
         p2.x = p2Pos[0]
         p2.y = p2Pos[1]
+        p2.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT :
                 run = False
