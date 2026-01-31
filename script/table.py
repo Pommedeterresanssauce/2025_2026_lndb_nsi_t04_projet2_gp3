@@ -62,6 +62,9 @@ class Table :
         
         self.back_image = pygame.image.load('graphics/table_de_jeu/back.png').convert_alpha()
         self.back_image = pygame.transform.scale(self.back_image, (140, 192))
+        
+        self.selection_image = pygame.image.load('graphics/table_de_jeu/selection.png').convert_alpha()
+        self.selection_image = pygame.transform.scale(self.selection_image, (140, 192))
 
         self.deck_image = pygame.image.load('graphics/table_de_jeu/deck.png').convert_alpha()
         self.deck_image = pygame.transform.scale(self.deck_image, (140, 252))
@@ -292,10 +295,16 @@ class Table :
             
     
     def draw_board(self) :
+        mouse_pos = pygame.mouse.get_pos()
         if self.flop_done :
             i = 1
             for card in self.board :
-                self.screen.blit(self.card_images[card], self.board_image_pos[str(i)])
+                pos = self.board_image_pos[str(i)]
+                card_image = self.card_images[card]
+                card_rect = card_image.get_rect(topleft = pos)
+                self.screen.blit(card_image, pos)
+                if card_rect.collidepoint(mouse_pos) :
+                    self.screen.blit(self.selection_image, pos)
                 i += 1
 
 
@@ -303,9 +312,9 @@ class Table :
         self.update_turn_phase(dt)
         self.turn_action()
         self.draw()
+        self.draw_board()
         self.update_and_draw_animations(dt)
         self.draw_deck()    
-        self.draw_board()
         if self.active_turn not in ['shuffle', 'distribution'] :
             self.player1.draw(self.screen)
 
