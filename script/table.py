@@ -305,6 +305,7 @@ class Table :
                 self.screen.blit(card_image, pos)
                 if card_rect.collidepoint(mouse_pos) :
                     self.screen.blit(self.selection_image, pos)
+                    self.player.draw_card_info(card, self.screen)
                 i += 1
 
 
