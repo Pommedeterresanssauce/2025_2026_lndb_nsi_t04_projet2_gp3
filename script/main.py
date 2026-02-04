@@ -2,14 +2,16 @@ import pygame
 import pygame, sys
 from table import *
 from settings import *
+from menu import *
 
-class Simulation :
+class Game :
     def __init__(self) :
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.DOUBLEBUF, vsync=1)
         pygame.display.set_caption("Poker 2")
         self.clock = pygame.time.Clock()
         
+        self.menu = Menu(self.screen)
         self.table = Table()
 
     def run(self) :
@@ -21,9 +23,12 @@ class Simulation :
                     pygame.quit()
                     sys.exit()
 
-            self.table.update(dt)
+            if self.menu.is_open :
+                self.menu.update()
+            else :
+                self.table.update(dt)
             pygame.display.update()
 
 if __name__ == "__main__" :
-    sim = Simulation()
-    sim.run()
+    game = Game()
+    game.run()
