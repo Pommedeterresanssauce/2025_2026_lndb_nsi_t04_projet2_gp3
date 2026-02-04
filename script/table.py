@@ -315,8 +315,8 @@ class Table :
         self.turn_action()
         self.draw()
         self.draw_board()
+        self.draw_deck()   
         self.update_and_draw_animations(dt)
-        self.draw_deck()    
         if self.active_turn not in ['shuffle', 'distribution'] :
             self.player1.draw(self.screen)
 
