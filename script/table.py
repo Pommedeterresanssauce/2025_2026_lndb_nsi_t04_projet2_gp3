@@ -13,7 +13,8 @@ class Table :
         # --- PLAYERS --- 
         self.player1 = Player()
         self.player2 = Player()
-        self.players = [self.player1, self.player2]
+        self.player3 = Player()
+        self.players = [self.player1, self.player2, self.player3]
 
         # --- PHASE ---
         self.active_turn = 'shuffle'
@@ -314,8 +315,8 @@ class Table :
         self.turn_action()
         self.draw()
         self.draw_board()
+        self.draw_deck()   
         self.update_and_draw_animations(dt)
-        self.draw_deck()    
         if self.active_turn not in ['shuffle', 'distribution'] :
             self.player1.draw(self.screen)
 
