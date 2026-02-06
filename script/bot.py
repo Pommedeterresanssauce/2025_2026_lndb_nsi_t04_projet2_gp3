@@ -1,6 +1,7 @@
 from combinations import*
 from math import*
 from random import*
+from probability import*
 
 class Bot :
     def __init__ (self, hand, table, chips, indice, level) :
@@ -52,30 +53,9 @@ class Bot :
                 return 'bet'
             return 'fold'
         
-    def level_3 (self) :
-        combo = combinations(self.hand, self.table)
-        global_combo = combinations([], self.table)
-        bluff = self.is_bluff()
+    def level_max (self) :
 
-        if combo == global_combo :
-            if bluff :
-                return 'bet'
-            return 'call'
-        
-        if self.indice < combo :
-            if bluff :
-                return 'call'
-            return 'bet'
-        
-        elif self.indice == combo :
-            if bluff :
-                return 'bet'
-            return 'call'
-        
-        else :
-            if bluff :
-                return 'bet'
-            return 'fold'
+
 
     def bot_turn (self) :
         pass

@@ -178,4 +178,3 @@ def is_jackpot(cards) :
         return True
     
     return False
-
