@@ -158,7 +158,7 @@ class Table :
             self.board_generation()
             
         if self.active_turn == 'player1' :
-            self.player1.update()
+            self.player1.update(self.screen)
             
             
     def update_turn_phase(self, dt) :
@@ -312,11 +312,11 @@ class Table :
 
     def update(self, dt):
         self.update_turn_phase(dt)
-        self.turn_action()
         self.draw()
-        self.draw_board()
-        self.draw_deck()   
+        self.draw_board()   
+        self.turn_action()
         self.update_and_draw_animations(dt)
+        self.draw_deck()
         if self.active_turn not in ['shuffle', 'distribution'] :
             self.player1.draw(self.screen)
 
