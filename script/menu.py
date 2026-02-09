@@ -21,13 +21,7 @@ class Menu:
 
         padding_x = 30
         padding_y = 15
-
-        self.title_bg_rect = pygame.Rect(
-            0,
-            0,
-            self.title_rect.width + padding_x * 2,
-            self.title_rect.height + padding_y * 2
-        )
+        self.title_bg_rect = pygame.Rect(0, 0, self.title_rect.width + padding_x * 2, self.title_rect.height + padding_y * 2)
 
         self.title_bg_rect.midtop = (self.screen.get_width() // 2, 20)
         self.title_rect.center = self.title_bg_rect.center

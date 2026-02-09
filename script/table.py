@@ -9,12 +9,14 @@ class Table :
         self.player = Player()
         self.screen = pygame.display.get_surface()
         self.screen_width, self.screen_height = self.screen.get_size()
+        self.mouse_clicked = False
 
         # --- PLAYERS --- 
         self.player1 = Player()
         self.player2 = Player()
         self.player3 = Player()
-        self.players = [self.player1, self.player2, self.player3]
+        self.players = [self.player1, self.player2]
+        self.active_player_indice = 0
 
         # --- PHASE ---
         self.active_turn = 'shuffle'
@@ -25,6 +27,7 @@ class Table :
         self.distribution_animation_done = False
         self.board_generation_done = False
         self.board_generation_anim_done = False
+        self.player_turn_done = False
         
         # --- DECK COMPOSITION ---
         self.deck_cards = []
@@ -53,6 +56,8 @@ class Table :
             '4' : (792.5, 657),
             '5' : (977.5, 657),
         }
+        self.pot = 0
+        self.max_bet = 0
 
         # --- IMAGES ---
         self.table_image = pygame.image.load('graphics/table_de_jeu/table_verte.png').convert()
@@ -157,8 +162,10 @@ class Table :
         if self.active_turn == 'board_generation' and not self.board_generation_done : 
             self.board_generation()
             
-        if self.active_turn == 'player1' :
-            self.player1.update(self.screen)
+        possible_actions = ['Check', 'Bet', 'Fold'] if self.max_bet == 0 else ['Call', 'Raise', 'Fold']
+        
+        if self.active_turn == 'player' :
+            self.players[self.active_player_indice].update(self.screen, possible_actions, self)
             
             
     def update_turn_phase(self, dt) :
@@ -185,9 +192,16 @@ class Table :
         
         # quand la mise en place des cartes communes est terminée
         if self.active_turn == 'board_generation' and self.board_generation_done and self.board_generation_anim_done :
-            self.active_turn = 'player1'
-            # print('okk')
-            
+            self.active_turn = 'player'
+
+        # quand le tour du joueur est terminé
+        if self.active_turn == 'player' and self.player_turn_done :
+            self.player_turn_done = False
+            self.active_player_indice += 1
+            if self.active_player_indice >= len(self.players) :
+                self.active_player_indice = 0
+                self.active_turn = 'board_generation'
+                
     
     def update_and_draw_flop_animation(self, dt) :
         if self.animations_infos['board_generation']['card1_pos'][1] < self.animations_infos['board_generation']['card1_final_pos'][1] :
@@ -310,7 +324,7 @@ class Table :
                 i += 1
 
 
-    def update(self, dt):
+    def update(self, dt) :
         self.update_turn_phase(dt)
         self.draw()
         self.draw_board()   
@@ -318,7 +332,8 @@ class Table :
         self.update_and_draw_animations(dt)
         self.draw_deck()
         if self.active_turn not in ['shuffle', 'distribution'] :
-            self.player1.draw(self.screen)
+            self.player1.draw(self.screen) 
+            # self.players[self.active_player_indice].draw(self.screen) 
 
     
     
