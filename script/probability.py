@@ -35,7 +35,25 @@ def calculate_probability(hand, table, deck) :
     return proba_river(hand, table, deck)
 
 def proba_preflop (hand, table, deck) :
-    pass
+    
+    table.append(deck[0])
+    table.append(deck[1])
+    table.append(deck[2])
+    table.append(deck[3])
+    table.append(deck[4])
+
+    while len(deck) > 4 :
+        table[0] = deck.pop(0)
+        for card in deck :
+
+            table[4] = card
+            combo = combinations(hand, table)
+
+            if combo >= 1 :
+                proba_table[combo] += 1
+            proba_table["total"] += 1
+
+    return proba_table
 
 def proba_flop (hand, table, deck) :
     
@@ -55,23 +73,6 @@ def proba_flop (hand, table, deck) :
     return proba_table
 
 def proba_turn (hand, table, deck) :
-    
-    table.append(deck[0])
-    table.append(deck[1])
-    while len(deck) > 1 :
-        table[3] = deck.pop(0)
-        for card in deck :
-
-            table[4] = card
-            combo = combinations(hand, table)
-
-            if combo >= 1 :
-                proba_table[combo] += 1
-            proba_table["total"] += 1
-
-    return proba_table
-
-def proba_river (hand, table, deck) :
 
     table.append(deck[0])
 
@@ -85,3 +86,8 @@ def proba_river (hand, table, deck) :
         proba_table["total"] += 1
 
     return proba_table
+
+def proba_river (hand, table, deck) :
+    pass
+
+print(calculate_probability(["2H", "3D"], ["4S", "5C", "6H"], ))
