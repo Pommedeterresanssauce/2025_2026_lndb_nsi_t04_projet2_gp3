@@ -2,6 +2,7 @@ import pygame
 from player import *
 from support import import_folder
 import random
+from bot_test import *
 
 
 class Table :
@@ -13,9 +14,9 @@ class Table :
 
         # --- PLAYERS --- 
         self.player1 = Player()
-        self.player2 = Player()
-        self.player3 = Player()
-        self.players = [self.player1, self.player2]
+        self.player2 = BotTest()
+        self.player3 = BotTest()
+        self.players = [self.player1, self.player2, self.player3]
         self.active_player_indice = 0
 
         # --- PHASE ---
@@ -201,6 +202,8 @@ class Table :
             if self.active_player_indice >= len(self.players) :
                 self.active_player_indice = 0
                 self.active_turn = 'board_generation'
+            if self.players[self.active_player_indice].type == 'bot' : 
+                self.players[self.active_player_indice].beginning_turn_time = pygame.time.get_ticks()
                 
     
     def update_and_draw_flop_animation(self, dt) :

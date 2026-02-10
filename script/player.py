@@ -2,7 +2,10 @@ import pygame
 
 class Player : 
     def __init__(self) :
+        self.type = 'player'
         self.hand = []
+        self.chip_number = 2000
+        self.placing_a_bet = False
         
         # --- UI ---
         self.ui_card_color = {
@@ -27,7 +30,8 @@ class Player :
             '13' : 'Roi'
         }
         self.font = pygame.font.Font('graphics/ui/font.ttf', 40)
-        
+        self.chip_font = pygame.font.Font('graphics/ui/font.ttf', 65)
+    
         # --- BUTTON ACTION ---
         self.actions = ['Check', 'Bet', 'Call', 'Raise', 'Fold']
 
@@ -60,6 +64,15 @@ class Player :
         self.card1_pos = [800, 890]
         self.card2_pos = [970, 890]
         
+        self.stack_1_image = pygame.image.load('graphics/table_de_jeu/coin_stack/1.png').convert_alpha()
+        self.stack_1_image = pygame.transform.scale_by(self.stack_1_image, 4)
+        self.stack_2_image = pygame.image.load('graphics/table_de_jeu/coin_stack/10.png').convert_alpha()
+        self.stack_2_image = pygame.transform.scale_by(self.stack_2_image, 4)
+        self.stack_3_image = pygame.image.load('graphics/table_de_jeu/coin_stack/20.png').convert_alpha()
+        self.stack_3_image = pygame.transform.scale_by(self.stack_3_image, 4)
+        self.stack_4_image = pygame.image.load('graphics/table_de_jeu/coin_stack/100.png').convert_alpha()
+        self.stack_4_image = pygame.transform.scale_by(self.stack_4_image, 4)
+        
         
     def draw_card_info(self, card_code, screen) :
         name_code = card_code[0] + card_code[1]
@@ -67,6 +80,18 @@ class Player :
         card = str(self.ui_card_name[name_code] + ' de ' + self.ui_card_color[color_code])
         text_surface = self.font.render(card, True, (255, 255, 255))
         screen.blit(text_surface, (230, 80))
+        
+    
+    def draw_stacks(self, screen) :
+        screen.blit(self.stack_1_image, (1450, 920))
+        screen.blit(self.stack_2_image, (1560, 920))
+        screen.blit(self.stack_3_image, (1670, 920))
+        screen.blit(self.stack_4_image, (1780, 920))
+        
+        text_surface = self.font.render('CHIP STACK :', True, (255, 255, 255))
+        chip_number_text_surface = self.chip_font.render(str(self.chip_number), True, (255, 255, 255))
+        screen.blit(text_surface, (1500, 780))
+        screen.blit(chip_number_text_surface, (1560, 830))
         
         
     def draw(self, screen) :
@@ -90,6 +115,8 @@ class Player :
         
         screen.blit(self.card1_image, self.card1_pos)
         screen.blit(self.card2_image, self.card2_pos)
+        
+        self.draw_stacks(screen)
 
 
     def draw_menu_rect(self, screen) :
@@ -148,29 +175,30 @@ class Player :
 
     def action_check(self, table) :
         table.player_turn_done = True
-        print('CHECK')
 
 
     def action_call(self, table) :
         table.player_turn_done = True
-        print('CALL')
+        table.pot += table.max_bet
+        self.chip_font -= table.max_bet
 
 
     def action_bet(self, table) :
-        table.player_turn_done = True
-        print('BET')
+        self.placing_a_bet = True
 
 
     def action_raise(self, table) :
-        table.player_turn_done = True
-        print('RAISE')
+        self.placing_a_bet = True
 
 
     def action_fold(self, table) :
         table.player_turn_done = True
         table.players.remove(self)
         table.active_player_indice -= 1
-        print('FOLD')
+    
+    
+    def place_a_bet(self, screen, table) :
+        pass
     
     
     def handle_action_input(self, possible_actions, table) :
@@ -179,7 +207,7 @@ class Player :
 
             if mouse_pressed :
                 for button in self.action_buttons :
-                    if button['hovered'] and button['name'] in possible_actions:
+                    if button['hovered'] and button['name'] in possible_actions :
                         action_name = button['callback']
                         action_method = getattr(self, f'action_{action_name}', None)
                         if action_method :
@@ -187,6 +215,9 @@ class Player :
 
 
     def update(self, screen, possible_actions, table) :
-        self.draw_menu_rect(screen)
-        self.draw_action_buttons(screen, possible_actions)
-        self.handle_action_input(possible_actions, table)
+        if not self.placing_a_bet :
+            self.draw_menu_rect(screen)
+            self.draw_action_buttons(screen, possible_actions)
+            self.handle_action_input(possible_actions, table)
+        else :
+            self.place_a_bet(screen, table)
