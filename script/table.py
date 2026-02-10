@@ -75,6 +75,8 @@ class Table :
 
         self.deck_image = pygame.image.load('graphics/table_de_jeu/deck.png').convert_alpha()
         self.deck_image = pygame.transform.scale(self.deck_image, (140, 252))
+        
+        self.font = pygame.font.Font('graphics/ui/font.ttf', 55)
 
         # --- ANIMATIONS ---
         self.animations = {
@@ -327,6 +329,21 @@ class Table :
                 i += 1
 
 
+    def draw_chip_infos(self) :
+        # rects
+        pygame.draw.rect(self.screen, (46, 82, 58), (635, 1, 618, 142))
+        pygame.draw.rect(self.screen, (104, 157, 113), (640, 6, 608, 132))
+        
+        # infos
+        pot_text = f'POT : {self.pot}'
+        max_bet_text = f'MAX BET : {self.max_bet}'
+        pot_text_surface = self.font.render(pot_text, True, (255, 255, 255))
+        max_bet_text_surface = self.font.render(max_bet_text, True, (255, 255, 255))
+        self.screen.blit(pot_text_surface, (797, 5))
+        self.screen.blit(max_bet_text_surface, (647, 65))
+        
+
+
     def update(self, dt) :
         self.update_turn_phase(dt)
         self.draw()
@@ -334,6 +351,7 @@ class Table :
         self.turn_action()
         self.update_and_draw_animations(dt)
         self.draw_deck()
+        self.draw_chip_infos()
         if self.active_turn not in ['shuffle', 'distribution'] :
             self.player1.draw(self.screen) 
             # self.players[self.active_player_indice].draw(self.screen) 

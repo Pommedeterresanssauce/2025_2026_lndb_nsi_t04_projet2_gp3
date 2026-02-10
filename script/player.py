@@ -66,8 +66,7 @@ class Player :
         self.slider_rect = pygame.Rect(1180, 850, 200, 10)
         self.slider_handle_rect = pygame.Rect(1180, 842, 14, 26)
 
-        # ZONE DE CLIC LARGE (HITBOX)
-        self.slider_hitbox_rect = pygame.Rect(
+        self.slider_hitbox_rect = pygame.Rect( # ZONE DE CLIC LARGE (HITBOX)
             self.slider_rect.x,
             self.slider_rect.y - 20,
             self.slider_rect.width,
@@ -281,7 +280,6 @@ class Player :
             self.placing_a_bet = False
             self.bet_value = 0
 
-    
     
     def handle_action_input(self, possible_actions, table) :
             # mouse_pos = pygame.mouse.get_pos()
