@@ -351,8 +351,8 @@ class Table :
         self.turn_action()
         self.update_and_draw_animations(dt)
         self.draw_deck()
-        self.draw_chip_infos()
         if self.active_turn not in ['shuffle', 'distribution'] :
+            self.draw_chip_infos()
             self.player1.draw(self.screen) 
             # self.players[self.active_player_indice].draw(self.screen) 
 
