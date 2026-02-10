@@ -129,14 +129,14 @@ def is_straight_flush(cards) :
 def is_royal_flush(cards) :
     
     for i in cards :
-        if cards[i][10] + cards[i][11] + cards[i][12] + cards[i][13] + cards[i][0] == 5 :
+        if cards[i][10] + cards[i][11] + cards[i][12] + cards[i][9] + cards[i][0] == 5 :
             return True
         
     return False
 
 def high_card(cards) :
     for i in range(13) :
-        if cards["p"][13 - i] + cards["c"][13 - i] + cards["t"][13 - i] + cards["k"][13 - i] > 0:
+        if cards["p"][12 - i] + cards["c"][12 - i] + cards["t"][12 - i] + cards["k"][12 - i] > 0:
             return (i * 0.0099999)
         
 # COMBO SPECIAUX        
