@@ -57,6 +57,26 @@ class Player :
                 'hovered' : False,
                 'callback' : action.lower()
             })
+            
+        # --- BET SLIDER ---
+        self.bet_min = 0
+        self.bet_max = 0
+        self.bet_value = 0
+
+        self.slider_rect = pygame.Rect(1180, 850, 200, 10)
+        self.slider_handle_rect = pygame.Rect(1180, 842, 14, 26)
+
+        # ZONE DE CLIC LARGE (HITBOX)
+        self.slider_hitbox_rect = pygame.Rect(
+            self.slider_rect.x,
+            self.slider_rect.y - 20,
+            self.slider_rect.width,
+            self.slider_rect.height + 40
+        )
+
+        self.dragging_slider = False
+
+        self.validate_button_rect = pygame.Rect(1175, 900, 200, 50)
         
         # --- IMAGES ---
         self.card1_image = None
@@ -198,7 +218,69 @@ class Player :
     
     
     def place_a_bet(self, screen, table) :
-        pass
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()[0]
+        mouse_pressed_once = table.mouse_clicked
+
+        # Initialisation une seule fois
+        if self.bet_value == 0 :
+            self.bet_min = table.max_bet + 1
+            self.bet_max = self.chip_number
+            self.bet_value = self.bet_min
+
+        # --- PANEL ---
+        pygame.draw.rect(screen, (46, 82, 58), (1150, 657, 250, 410))
+        pygame.draw.rect(screen, (104, 157, 113), (1155, 662, 240, 400))
+
+        title = self.font.render('YOUR BET', True, (255, 255, 255))
+        screen.blit(title, (1160, 670))
+
+        # --- SLIDER BAR ---
+        pygame.draw.rect(screen, (30, 60, 40), self.slider_rect, border_radius=5)
+
+        ratio = (self.bet_value - self.bet_min) / (self.bet_max - self.bet_min)
+        self.slider_handle_rect.centerx = self.slider_rect.left + int(ratio * self.slider_rect.width)
+
+        pygame.draw.rect(screen, (200, 230, 210), self.slider_handle_rect, border_radius=6)
+
+        # --- DRAG START ---
+        if mouse_pressed and self.slider_hitbox_rect.collidepoint(mouse_pos) :
+            self.dragging_slider = True
+
+        # --- DRAG STOP ---
+        if not mouse_pressed :
+            self.dragging_slider = False
+
+        # --- DRAGGING ---
+        if self.dragging_slider :
+            x = max(self.slider_rect.left, min(mouse_pos[0], self.slider_rect.right))
+            ratio = (x - self.slider_rect.left) / self.slider_rect.width
+            self.bet_value = int(self.bet_min + ratio * (self.bet_max - self.bet_min))
+
+        # --- BET VALUE ---
+        bet_text = self.font.render(f'Bet: {self.bet_value}', True, (255, 255, 255))
+        screen.blit(bet_text, (1155, 800))
+
+        # --- VALIDATE BUTTON ---
+        hovering = self.validate_button_rect.collidepoint(mouse_pos)
+        color = (60, 200, 120) if hovering else (40, 170, 90)
+
+        pygame.draw.rect(screen, color, self.validate_button_rect, border_radius=14)
+
+        text = self.font.render('VALIDER', True, (240, 255, 245))
+        text_rect = text.get_rect(center=self.validate_button_rect.center)
+        screen.blit(text, text_rect)
+
+        # --- VALIDATION ---
+        if mouse_pressed_once and hovering :
+            self.chip_number -= self.bet_value
+            table.pot += self.bet_value
+            table.max_bet = self.bet_value
+
+            table.player_turn_done = True
+            self.placing_a_bet = False
+            self.bet_value = 0
+
     
     
     def handle_action_input(self, possible_actions, table) :
