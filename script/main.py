@@ -11,10 +11,8 @@ class Game :
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.DOUBLEBUF, vsync=1)
         pygame.display.set_caption("Poker 2")
         self.clock = pygame.time.Clock()
-        # self.n = Network()
         self.menu = Menu(self.screen)
         self.table = Table()
-        # self.table = self.n.send('get')
 
     def run(self) :
         while True :
