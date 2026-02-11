@@ -17,10 +17,11 @@ class Table :
 
         # --- PLAYERS --- 
         self.player1 = Player()
-        self.player2 = BotTest()
-        self.player3 = BotTest()
-        self.players = [self.player1, self.player2, self.player3] 
-        self.round_players = [self.player1, self.player2, self.player3]
+        self.player2 = BotTest('graphics/bot/eliott.jpg', (1600, 0))
+        self.player3 = BotTest('graphics/bot/roman.jpg', (300, 0))
+        self.player4 = BotTest('graphics/bot/greg.jpg', (0, 400))
+        self.players = [self.player1, self.player2, self.player3, self.player4] 
+        self.round_players = [self.player1, self.player2, self.player3, self.player4]
         self.players_who_can_receive_chips = []
         self.active_player_indice = 0
 
@@ -201,7 +202,7 @@ class Table :
             elif score == best_score :  
                 winners.append(player)
 
-        if winners:
+        if winners :
             gain = self.pot // len(winners)
 
             for winner in winners :
@@ -581,6 +582,9 @@ class Table :
         if self.active_turn not in ['shuffle', 'distribution'] :
             self.draw_chip_infos()
             self.player1.draw(self.screen) 
+            self.player2.draw_image(self.screen)
+            self.player3.draw_image(self.screen)
+            self.player4.draw_image(self.screen)
             # self.players[self.active_player_indice].draw(self.screen) 
         self.update_transition(dt, self)
 
