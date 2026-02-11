@@ -13,14 +13,14 @@ class Game :
         self.clock = pygame.time.Clock()
         self.menu = Menu(self.screen)
         self.table = Table()
+        
+        self.network = Network(on_state_update=self.on_game_state_updated)
+        self.connected = self.network.connect()
 
     def run(self) :
         while True :
             dt = self.clock.tick(0) / 1000.0  # secondes
             events = pygame.event.get()
-            # new_table = self.n.send('update')
-            # if new_table :
-            #     self.table = new_table
             self.table.mouse_clicked = False
             for event in events :
                 if event.type == pygame.QUIT :
