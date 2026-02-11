@@ -90,4 +90,4 @@ def proba_turn (hand, table, deck) :
 def proba_river (hand, table, deck) :
     pass
 
-print(calculate_probability(["02p", "03p"], ["10c", "02k", "02t"], ["02c", "05c", "07c", "09c", "10c", "11c", "12c", "13c"]))
+# print(calculate_probability(["02p", "03p"], ["10c", "02k", "02t"], ["02c", "05c", "07c", "09c", "10c", "11c", "12c", "13c"]))

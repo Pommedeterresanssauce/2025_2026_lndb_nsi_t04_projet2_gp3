@@ -14,8 +14,8 @@ class Game :
         self.menu = Menu(self.screen)
         self.table = Table()
         
-        self.network = Network(on_state_update=self.on_game_state_updated)
-        self.connected = self.network.connect()
+        # self.network = Network(on_state_update=self.on_game_state_updated)
+        # self.connected = self.network.connect()
 
     def on_game_state_updated(self, state_data):
         """Appelé quand le serveur envoie un nouvel état"""

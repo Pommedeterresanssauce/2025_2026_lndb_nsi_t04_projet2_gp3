@@ -138,10 +138,14 @@ class Table :
     
     
     def turn(self) :
+        self.board.append(self.deck_cards[self.deck_indice])
+        self.deck_indice += 1
         self.board_generation_done = True
-    
+        
     
     def river(self) :
+        self.board.append(self.deck_cards[self.deck_indice])
+        self.deck_indice += 1
         self.board_generation_done = True
         
     
@@ -196,6 +200,8 @@ class Table :
         # quand la mise en place des cartes communes est terminée
         if self.active_turn == 'board_generation' and self.board_generation_done and self.board_generation_anim_done :
             self.active_turn = 'player'
+            self.board_generation_done = False
+            self.board_generation_anim_done = False
 
         # quand le tour du joueur est terminé
         if self.active_turn == 'player' and self.player_turn_done :
@@ -203,7 +209,9 @@ class Table :
             self.active_player_indice += 1
             if self.active_player_indice >= len(self.players) :
                 self.active_player_indice = 0
-                self.active_turn = 'board_generation'
+                if not self.river_done :
+                    self.active_turn = 'board_generation'
+                    self.actual_animations.append('board_generation')
             if self.players[self.active_player_indice].type == 'bot' : 
                 self.players[self.active_player_indice].beginning_turn_time = pygame.time.get_ticks()
                 
@@ -236,19 +244,41 @@ class Table :
     
     
     def update_and_draw_turn_animation(self, dt) :
-        pass
+        if self.animations_infos['board_generation']['card4_pos'][1] < self.animations_infos['board_generation']['card4_final_pos'][1] :
+            # update card4
+            self.animations_infos['board_generation']['card4_pos'][0] -= dt * 92.5
+            self.animations_infos['board_generation']['card4_pos'][1] += dt * 507
+            # define the new position
+            card4_pos = self.animations_infos['board_generation']['card4_pos']
+        else :
+            card4_pos = self.animations_infos['board_generation']['card4_final_pos']
+            self.board_generation_anim_done = True
+            self.turn_done = True
+            self.actual_animations.remove('board_generation')
+        self.screen.blit(self.back_image, card4_pos)
     
     
     def update_and_draw_river_animation(self, dt) :
-        pass
+        if self.animations_infos['board_generation']['card5_pos'][1] < self.animations_infos['board_generation']['card5_final_pos'][1] :
+            # update card5
+            self.animations_infos['board_generation']['card5_pos'][0] += dt * 92.5
+            self.animations_infos['board_generation']['card5_pos'][1] += dt * 507
+            # define the new position
+            card5_pos = self.animations_infos['board_generation']['card5_pos']
+        else :
+            card5_pos = self.animations_infos['board_generation']['card5_final_pos']
+            self.board_generation_anim_done = True
+            self.river_done = True
+            self.actual_animations.remove('board_generation')
+        self.screen.blit(self.back_image, card5_pos)
     
     
     def update_and_draw_board_generation_animation(self, dt) :
         if not self.flop_done :
             self.update_and_draw_flop_animation(dt)
-        elif self.flop_done :
+        elif not self.turn_done :
             self.update_and_draw_turn_animation(dt)
-        else :
+        elif not self.river_done :
             self.update_and_draw_river_animation(dt)
     
     
@@ -327,6 +357,10 @@ class Table :
                     self.screen.blit(self.selection_image, pos)
                     self.player.draw_card_info(card, self.screen)
                 i += 1
+                if not self.turn_done and i == 4 :
+                    break
+                if not self.river_done and i == 5 :
+                    break
 
 
     def draw_chip_infos(self) :
@@ -342,7 +376,6 @@ class Table :
         self.screen.blit(pot_text_surface, (797, 5))
         self.screen.blit(max_bet_text_surface, (647, 65))
         
-
 
     def update(self, dt) :
         self.update_turn_phase(dt)
