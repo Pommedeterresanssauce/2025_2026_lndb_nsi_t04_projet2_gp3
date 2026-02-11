@@ -98,7 +98,7 @@ class Player :
         color_code = card_code[2]
         card = str(self.ui_card_name[name_code] + ' de ' + self.ui_card_color[color_code])
         text_surface = self.font.render(card, True, (255, 255, 255))
-        screen.blit(text_surface, (230, 80))
+        screen.blit(text_surface, (100, 950))
         
     
     def draw_stacks(self, screen) :
@@ -192,6 +192,12 @@ class Player :
                 screen.blit(text_surface, text_rect)
 
 
+    def all_in(self, table) :
+        table.pot += self.chip_number
+        self.chip_number = 0
+        table.player_turn_done = True
+
+
     def action_check(self, table) :
         table.player_turn_done = True
 
@@ -199,15 +205,21 @@ class Player :
     def action_call(self, table) :
         table.player_turn_done = True
         table.pot += table.max_bet
-        self.chip_font -= table.max_bet
+        self.chip_number -= table.max_bet
 
 
     def action_bet(self, table) :
-        self.placing_a_bet = True
+        if self.chip_number >= table.max_bet :
+            self.placing_a_bet = True
+        else :
+            self.all_in(table)
 
 
     def action_raise(self, table) :
-        self.placing_a_bet = True
+        if self.chip_number > table.max_bet :
+            self.placing_a_bet = True
+        else :
+            self.all_in(table)
 
 
     def action_fold(self, table) :
