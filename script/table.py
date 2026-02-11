@@ -3,6 +3,7 @@ from player import *
 from support import import_folder
 import random
 from bot_test import *
+from combinations import *
 
 
 class Table :
@@ -85,7 +86,9 @@ class Table :
 
         # --- ANIMATIONS ---
         self.animations = {
-            'shuffle' : import_folder('graphics/animations/shuffle')
+            'shuffle' : import_folder('graphics/animations/shuffle'),
+            'win' : import_folder('graphics/animations/win'),
+            'lose' : import_folder('graphics/animations/lose')
         }
 
         self.actual_animations = []
@@ -94,7 +97,20 @@ class Table :
             # shuffle anim infos
             'shuffle' : {
                 'pos' : (625, 102),
-                'index' : 0
+                'index' : 0,
+                'speed' : 12
+            },
+            # win anim
+            'win' : {
+                'pos' : (0, 0),
+                'index' : 0,
+                'speed' : 6
+            },
+            # lose anim
+            'lose' : {
+                'pos' : (0, 0),
+                'index' : 0,
+                'speed' : 6
             },
             # distribution anim infos
             'distribution' : {
@@ -165,10 +181,52 @@ class Table :
 
 
     def chip_distribution(self) :
-        self.chip_distribution_done = True
-        for player in self.players :
-            if player.chip_number == 0 :
+        # from combinations import combinations
+
+        # # Sécurité si personne n'est éligible
+        # if not self.players_who_can_receive_chips:
+        #     self.chip_distribution_done = True
+        #     return
+
+        # # 1. Trouver le meilleur score parmi les joueurs éligibles
+        # best_score = -1
+        # winners = []
+
+        # for player in self.players_who_can_receive_chips:
+        #     # On évalue la main du joueur avec les cartes sur la table
+        #     score = combinations(player.hand, self.board)
+            
+        #     if score > best_score:
+        #         best_score = score
+        #         winners = [player]
+        #     elif score == best_score:
+        #         winners.append(player)
+
+        # # 2. Distribuer le pot
+        # if winners:
+        #     gain_per_winner = self.pot // len(winners)
+        #     for winner in winners:
+        #         winner.chip_number += gain_per_winner
+                
+        #         # Gestion des animations selon le type du gagnant
+        #         if winner.type == 'player':
+        #             if 'win' not in self.actual_animations:
+        #                 self.actual_animations.append('win')
+        #         else: # C'est un bot
+        #             if 'lose' not in self.actual_animations:
+        #                 self.actual_animations.append('lose')
+
+        # # 3. Nettoyage et élimination des joueurs sans jetons
+        # self.pot = 0
+        # self.chip_distribution_done = True
+        
+        # On utilise une copie [:] pour pouvoir supprimer des éléments en itérant
+        for player in self.players[:]:
+            if player.chip_number <= 0:
                 self.players.remove(player)
+        self.actual_animations.append('win')
+        self.chip_distribution_done = True
+        print('okk')
 
 
     def turn_reset(self) :
@@ -203,11 +261,25 @@ class Table :
         
         # reset des anims du board
         self.actual_animations = []
+        
         self.animations_infos = {
             # shuffle anim infos
             'shuffle' : {
                 'pos' : (625, 102),
-                'index' : 0
+                'index' : 0,
+                'speed' : 12
+            },
+            # win anim
+            'win' : {
+                'pos' : (0, 0),
+                'index' : 0,
+                'speed' : 6
+            },
+            # lose anim
+            'lose' : {
+                'pos' : (0, 0),
+                'index' : 0,
+                'speed' : 6
             },
             # distribution anim infos
             'distribution' : {
@@ -248,7 +320,7 @@ class Table :
         if self.active_turn == 'player' :
             self.round_players[self.active_player_indice].update(self.screen, possible_actions, self)
             
-        if self.active_turn == 'chip_distribution' :
+        if self.active_turn == 'chip_distribution' and not self.chip_distribution_done :
             self.chip_distribution()
             
             
@@ -295,7 +367,7 @@ class Table :
                 else :
                     # si la river a déjà été faite : on arrête les tours de mise
                     self.active_turn = 'chip_distribution'
-                    self.chip_distribution_anim_done = True
+                    # self.chip_distribution_anim_done = True
                     self.player_turn_done = False
             else :
                 # Si on n'est pas au bout de la table, on continue simplement le tour
@@ -422,13 +494,15 @@ class Table :
     
     
     def update_and_draw_frame_animation(self, animation, dt) :
-        self.animations_infos[animation]['index'] += dt * 12
+        self.animations_infos[animation]['index'] += dt * self.animations_infos[animation]['speed']
         index = int(self.animations_infos[animation]['index'])
 
         if index >= len(self.animations[animation]) :
             self.actual_animations.remove(animation)
             if animation == 'shuffle' :
                 self.shuffle_animation_done = True
+            if animation == 'win' or animation == 'lose' :
+                self.chip_distribution_anim_done = True
         else :
             pos = self.animations_infos[animation]['pos']
             self.screen.blit(self.animations[animation][index], pos)
@@ -436,7 +510,7 @@ class Table :
         
     def update_and_draw_animations(self, dt) :
         for animation in self.actual_animations.copy() :
-            if animation in ['shuffle'] :
+            if animation in ['shuffle', 'win', 'lose'] :
                 self.update_and_draw_frame_animation(animation, dt)
             elif animation == 'distribution' :
                 self.update_and_draw_distribution_animation(dt)

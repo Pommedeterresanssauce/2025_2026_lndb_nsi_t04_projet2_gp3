@@ -210,6 +210,8 @@ class Player :
             table.player_turn_done = True
             table.pot += table.max_bet
             self.chip_number -= table.max_bet
+            if self.chip_number == 0 :
+                table.round_players.remove(self)
         else :
             self.all_in(table)
 
@@ -303,6 +305,8 @@ class Player :
             table.player_turn_done = True
             self.placing_a_bet = False
             self.bet_value = 0
+            if self.chip_number == 0 :
+                table.round_players.remove(self)
 
     
     def handle_action_input(self, possible_actions, table) :

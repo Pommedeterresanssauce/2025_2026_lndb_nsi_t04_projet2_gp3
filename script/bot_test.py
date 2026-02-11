@@ -15,29 +15,29 @@ class BotTest :
     
     def action_check(self, table) :
         table.player_turn_done = True
-        print('check')
+        # print('check')
 
 
     def action_call(self, table) :
         table.player_turn_done = True
-        print('call')
+        # print('call')
 
 
     def action_bet(self, table) :
         table.player_turn_done = True
-        print('bet')
+        # print('bet')
 
 
     def action_raise(self, table) :
         table.player_turn_done = True
-        print('raise')
+        # print('raise')
 
 
     def action_fold(self, table) :
         table.player_turn_done = True
         table.round_players.remove(self)
         table.active_player_indice -= 1
-        print('fold')
+        # print('fold')
     
     
     def update(self, screen, possible_actions, table) :
