@@ -1,5 +1,6 @@
 from combinations import*
 from math import*
+from random import*
 import random
 from probability import*
 import pygame
@@ -83,24 +84,105 @@ class BotTest :
     
     def update(self, screen, possible_actions, table) :
         current_time = pygame.time.get_ticks()
-        if self.futur_action == None :
-            number = random.randint(1, 100)
-            if 'bet' in possible_actions :
-                if number <= 90 :
-                    self.futur_action = 'bet'
+        if current_time - self.beginning_turn_time >= 1000 :
+            # table.board
+            bluff_indice = randint(1, 10)
+            combo = combinations(self.hand, table.board)
+            probabilities = calculate_probability(table.board, table.deck_cards)
+            inferior_proba = get_inferior_proba(probabilities, combo)
+            superior_proba = get_superior_proba(probabilities, combo)
+            difference = 1 - inferior_proba - superior_proba
+
+            # Victoire (quasi) garantie du bot, pas de bluff, que de la mise 
+            if superior_proba + difference <= 0.15 :
+                if 'bet' in possible_actions :
+                    if self.chip_number > 500 :
+                        bet = randint(200, self.chip_number - 200)
+                    elif self.chip_number > 200 :
+                        bet = 100
+                    else :
+                        bet = self.chip_number
+                    self.future_action = 'bet'
+                
                 else :
-                    self.futur_action = 'check'
-            else :
-                if number <= 5 :
-                    self.futur_action = 'fold'
-                elif 5 < number <= 60 :
+                    bet = randint(table.max_bet, self.chip_number)
+                    self.future_action = 'raise'
+                
+            # Bot en position de force, bluff possible mais faible
+            elif superior_proba + difference <= 0.3 :
+                if bluff_indice > 8 :
+                    return self.action_call(table)
+                
+                elif 'bet' in possible_actions :
+                    if self.chip_number > 500 :
+                        bet = randint(200, self.chip_number - 200)
+                    elif self.chip_number > 200 :
+                        bet = 100
+                    else :
+                        bet = self.chip_number
+                    self.future_action = 'bet'
+                
+                else :
+                    if randint(1,2) == 1 :
+                        return self.action_raise(table, self.chip_number)
+                    else :
+                        if self.chip_number > 500 :
+                            self.futur_action = 'raise'
+                            bet = randint(table.max_bet, self.chip_number)
+                        else :
+                            self.futur_action = 'call'
+                        
+
+
+            elif superior_proba + difference	<= 0.5 :
+                if bluff_indice > 6 :
                     self.futur_action = 'call'
+                
+                elif 'bet' in possible_actions :
+                    if self.chip_number > 500 :
+                        bet = randint(200, self.chip_number - 200)
+                    elif self.chip_number > 200 :
+                        bet = 100
+                    else :
+                        bet = self.chip_number
+                    self.future_action = 'bet'
+                
                 else :
-                    self.futur_action = 'raise'
+                    if randint(1,2) == 1 :
+                        bet = self.chip_number
+                        self.futur_action = 'raise'
+                    else :
+                        if self.chip_number > 500 :
+                            bet = randint(table.max_bet, self.chip_number)
+                            self.futur_action = 'raise'
+                        else :
+                            self.futur_action = 'call'
+
+            elif superior_proba + difference <= 0.7 :
+                if bluff_indice > 8 :
+                    if self.chip_number > 500 :
+                        bet = randint(200, self.chip_number - 200)
+                    elif self.chip_number > 200 :
+                        bet = 100
+                    else :
+                        bet = self.chip_number
+                    self.future_action = 'bet'
+                
+                if "raise" in possible_actions :
+                    self.futur_action = 'fold'
+                
+                self.futur_action = 'check'
+                    
+            
+            # The bot is lowkey cooked
+            else :
+                if 'raise' in possible_actions :
+                    self.futur_action = 'fold'
+                self.futur_action = 'check'
                     
         if current_time - self.beginning_turn_time >= 1000 :
             if self.futur_action == 'bet' : 
-                self.action_bet(table, 1)
+                self.action_bet(table, bet)
             if self.futur_action == 'check' :
                 self.action_check(table)
             if self.futur_action == 'call' :
@@ -108,11 +190,8 @@ class BotTest :
             if self.futur_action == 'fold' :
                 self.action_fold(table)
             if self.futur_action == 'raise' :
-                self.action_raise(table, table.max_bet + 1)
+                self.action_raise(table, bet)
             self.futur_action = None
             
         else :
-            self.draw_action_name(screen)
-            
-            
-                    
+            self.draw_action_name(screen)     
