@@ -1,18 +1,15 @@
 class GameState:
-    """État du jeu côté serveur - facilement sérialisable"""
     
     def __init__(self):
-        # Données minimales pour synchroniser
-        self.players = []  # Liste de dicts avec infos joueurs
-        self.board = []    # Cartes communes
+        self.players = []  
+        self.board = []   
         self.pot = 0
         self.max_bet = 0
         self.active_player_index = 0
-        self.phase = 'shuffle'  # shuffle, distribution, player, etc.
+        self.phase = 'shuffle'  
         self.deck = []
         
     def to_dict(self):
-        """Convertir en dict pour pickle"""
         return {
             'players': self.players,
             'board': self.board,

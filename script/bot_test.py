@@ -9,7 +9,7 @@ class BotTest :
     def __init__ (self, image_path, draw_pos) :
         self.type = 'bot'
         self.hand = []
-        self.chip_number = 100000
+        self.chip_number = 2000
         self.image = pygame.transform.scale(pygame.image.load(image_path).convert(), (200, 200))
         self.draw_pos = draw_pos
         self.turn_done = False
@@ -20,11 +20,13 @@ class BotTest :
 
     def draw_image(self, screen) :
         screen.blit(self.image, self.draw_pos)
-
+        text_surface = self.font.render(str(self.chip_number), True, (255, 255, 255))
+        screen.blit(text_surface, (self.draw_pos[0] + 30, self.draw_pos[1] + 210))
+        
 
     def draw_action_name(self, screen) :
         text_surface = self.font.render(self.futur_action, True, (255, 255, 255))
-        screen.blit(text_surface, (self.draw_pos[0] + 30, self.draw_pos[1] + 210))
+        screen.blit(text_surface, (self.draw_pos[0] + 35, self.draw_pos[1] + 275))
 
 
     def all_in(self, table) :
