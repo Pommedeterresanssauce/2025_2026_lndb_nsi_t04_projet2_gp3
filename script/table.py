@@ -4,6 +4,7 @@ from support import import_folder
 import random
 from bot_test import *
 from combinations import *
+from transition import *
 
 
 class Table :
@@ -93,6 +94,7 @@ class Table :
 
         self.actual_animations = []
         self.actual_transition = None
+        self.transition_in_progress = False
 
         self.animations_infos = {
             # shuffle anim infos
@@ -380,7 +382,7 @@ class Table :
             
     def update_turn_phase(self, dt) :
         # --- la premiere phase du tout est le melange --- 
-        if self.active_turn == 'shuffle' and not self.shuffle_animation_done :
+        if self.active_turn == 'shuffle' and not self.shuffle_animation_done and not self.transition_in_progress :
             if 'shuffle' not in self.actual_animations :
                 self.animations_infos['shuffle']['index'] = 0
                 self.actual_animations.append('shuffle')
@@ -403,7 +405,12 @@ class Table :
             
         # --- quand le pot doit être distribué ---
         if self.active_turn == 'chip_distribution' and self.chip_distribution_done and self.chip_distribution_anim_done :
-            self.turn_reset()
+            # self.turn_reset()
+            if self.actual_transition == None :
+                def transition_action() :
+                    self.turn_reset()
+                self.actual_transition = CircleTransition(700, 1600, transition_action)
+                self.transition_in_progress = True
             
     
     def update_and_draw_flop_animation(self, dt) :
@@ -567,7 +574,12 @@ class Table :
         max_bet_text_surface = self.font.render(max_bet_text, True, (255, 255, 255))
         self.screen.blit(pot_text_surface, (797, 5))
         self.screen.blit(max_bet_text_surface, (647, 65))
-        
+
+
+    def update_transition(self, dt, table) :
+        if self.actual_transition != None :
+            self.actual_transition.update(dt, table)        
+
 
     def update(self, dt) :
         self.update_turn_phase(dt)
@@ -580,6 +592,7 @@ class Table :
             self.draw_chip_infos()
             self.player1.draw(self.screen) 
             # self.players[self.active_player_indice].draw(self.screen) 
+        self.update_transition(dt, self)
 
     
     
