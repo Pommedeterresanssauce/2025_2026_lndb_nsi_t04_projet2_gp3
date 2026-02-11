@@ -8,7 +8,7 @@ import socket
 from _thread import *
 import pickle
 from threading import Lock
-from script.multiserver.game_state import GameState
+from game_state import GameState
 
 class PokerServer:
     def __init__(self):
@@ -86,7 +86,7 @@ class PokerServer:
     
     def start(self):
         """Démarre le serveur"""
-        server = "192.168.1.17"
+        server = "192.168.2.139"
         port = 5555
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((server, port))

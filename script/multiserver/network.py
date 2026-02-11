@@ -6,7 +6,7 @@ from threading import Thread
 class Network:
     def __init__(self, on_state_update):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = "192.168.1.17"
+        self.server = "192.168.2.139"
         self.port = 5555
         self.addr = (self.server, self.port)
         self.player_id = None
