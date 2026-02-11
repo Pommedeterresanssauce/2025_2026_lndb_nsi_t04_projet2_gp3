@@ -16,7 +16,9 @@ class Table :
         self.player1 = Player()
         self.player2 = BotTest()
         self.player3 = BotTest()
-        self.players = [self.player1, self.player2, self.player3]
+        self.players = [self.player1, self.player2, self.player3] 
+        self.round_players = [self.player1, self.player2, self.player3]
+        self.players_who_can_receive_chips = []
         self.active_player_indice = 0
 
         # --- PHASE ---
@@ -29,6 +31,8 @@ class Table :
         self.board_generation_done = False
         self.board_generation_anim_done = False
         self.player_turn_done = False
+        self.chip_distribution_done = False
+        self.chip_distribution_anim_done = False
         
         # --- DECK COMPOSITION ---
         self.deck_cards = []
@@ -50,6 +54,7 @@ class Table :
         self.flop_done = False
         self.turn_done = False
         self.river_done = False
+        self.round_finished = False
         self.board_image_pos = {
             '1' : (700, 420),
             '2' : (885, 420),
@@ -159,9 +164,78 @@ class Table :
             self.river()
 
 
+    def chip_distribution(self) :
+        self.chip_distribution_done = True
+        for player in self.players :
+            if player.chip_number == 0 :
+                self.players.remove(player)
+
+
+    def turn_reset(self) :
+        # reset des phase d'un tour de jeu
+        self.active_turn = 'shuffle'
+        self.shuffle_done = False 
+        self.shuffle_animation_done = False
+        self.time_since_end_shuffle_anim = 0
+        self.distribution_done = False
+        self.distribution_animation_done = False
+        self.board_generation_done = False
+        self.board_generation_anim_done = False
+        self.player_turn_done = False
+        self.chip_distribution_done = False
+        self.chip_distribution_anim_done = False
+            
+        # reset des joueurs et de leur main
+        self.round_players = []
+        for player in self.players :
+            self.round_players.append(player)
+            player.hand = []
+            
+        # reset de la table de jeu (deck et board et jetons)
+        self.pot = 0
+        self.max_bet = 0
+        self.board = []
+        self.flop_done = False
+        self.turn_done = False
+        self.river_done = False
+        self.round_finished = False
+        self.deck_indice = 0
+        
+        # reset des anims du board
+        self.actual_animations = []
+        self.animations_infos = {
+            # shuffle anim infos
+            'shuffle' : {
+                'pos' : (625, 102),
+                'index' : 0
+            },
+            # distribution anim infos
+            'distribution' : {
+                'card1_pos' : [885, 150],
+                'card2_pos' : [885, 150],
+                'card1_final_pos' : (800, 890),
+                'card2_final_pos' : (970, 890),
+            },
+            # generation of the board anim infos
+            'board_generation' : {
+                'card1_pos' : [885, 150],
+                'card2_pos' : [885, 150],
+                'card3_pos' : [885, 150],
+                'card4_pos' : [885, 150],
+                'card5_pos' : [885, 150],
+                'card1_final_pos' : (700, 420),
+                'card2_final_pos' : (885, 420),
+                'card3_final_pos' : (1070, 420),
+                'card4_final_pos' : (792.5, 657),
+                'card5_final_pos' : (977.5, 657),
+            },
+        }
+    
+
     def turn_action(self) :
         if self.active_turn == 'shuffle' and not self.shuffle_done :
             self.shuffle_deck()
+            self.players_who_can_receive_chips = []
             
         if self.active_turn == 'distribution' and not self.distribution_done : 
             self.distribute_cards()
@@ -172,49 +246,93 @@ class Table :
         possible_actions = ['Check', 'Bet', 'Fold'] if self.max_bet == 0 else ['Call', 'Raise', 'Fold']
         
         if self.active_turn == 'player' :
-            self.players[self.active_player_indice].update(self.screen, possible_actions, self)
+            self.round_players[self.active_player_indice].update(self.screen, possible_actions, self)
             
+        if self.active_turn == 'chip_distribution' :
+            self.chip_distribution()
+            
+            
+    def shuffle_end(self, dt) :
+        if self.time_since_end_shuffle_anim > 0.3 :
+            self.active_turn = 'distribution'
+            if 'distribution' not in self.actual_animations :
+                self.actual_animations.append('distribution')
+        else :
+            self.time_since_end_shuffle_anim += dt
+            
+            
+    def distribution_end(self) :
+        self.active_turn = 'board_generation'
+        if 'board_generation' not in self.actual_animations :
+            self.actual_animations.append('board_generation')
+            
+            
+    def board_generation_end(self) :
+        self.active_turn = 'player'
+        self.board_generation_done = False
+        self.board_generation_anim_done = False
+            
+            
+    def player_turn_end(self) :
+        # Cas 1 : Un seul joueur restant ou round marqué comme fini
+        if  len(self.round_players) <= 1 and len(self.players_who_can_receive_chips) == 1 : 
+            self.active_turn = 'chip_distribution'
+            self.chip_distribution_anim_done = True
+            self.player_turn_done = False
+        # Cas 2 : il n'y a pas eu de tour apres le river et il reste plus de 1 joueur en competition
+        else :
+            self.active_player_indice += 1 # Passer au joueur suivant
+                
+            # Si on a fait le tour de la table
+            if self.active_player_indice >= len(self.round_players) :
+                self.active_player_indice = 0
+                    
+                if not self.river_done :
+                    # Si on n'est pas à la fin, on génère la phase suivante (Flop, Turn ou River)
+                    self.active_turn = 'board_generation'
+                    self.actual_animations.append('board_generation')
+                    self.player_turn_done = False 
+                else :
+                    # si la river a déjà été faite : on arrête les tours de mise
+                    self.active_turn = 'chip_distribution'
+                    self.chip_distribution_anim_done = True
+                    self.player_turn_done = False
+            else :
+                # Si on n'est pas au bout de la table, on continue simplement le tour
+                self.player_turn_done = False
+                    
+                # Pour les Bots
+                if self.round_players[self.active_player_indice].type == 'bot': 
+                    self.round_players[self.active_player_indice].beginning_turn_time = pygame.time.get_ticks()
+    
             
     def update_turn_phase(self, dt) :
-        # la premiere phase du tout est le melange
+        # --- la premiere phase du tout est le melange --- 
         if self.active_turn == 'shuffle' and not self.shuffle_animation_done :
             if 'shuffle' not in self.actual_animations :
                 self.animations_infos['shuffle']['index'] = 0
                 self.actual_animations.append('shuffle')
 
-        # quand le mélange est terminé depuis au moins 0.3 seconde
+        # --- quand le mélange est terminé depuis au moins 0.3 seconde ---
         if self.active_turn == 'shuffle' and self.shuffle_done and self.shuffle_animation_done :
-            if self.time_since_end_shuffle_anim > 0.3 :
-                self.active_turn = 'distribution'
-                if 'distribution' not in self.actual_animations :
-                    self.actual_animations.append('distribution')
-            else :
-                self.time_since_end_shuffle_anim += dt
+            self.shuffle_end(dt)
             
-        # quand la distribution est terminée    
+        # --- quand la distribution est terminée --- 
         if self.active_turn == 'distribution' and self.distribution_done and self.distribution_animation_done :
-            self.active_turn = 'board_generation'
-            if 'board_generation' not in self.actual_animations :
-                self.actual_animations.append('board_generation')
+            self.distribution_end()
         
-        # quand la mise en place des cartes communes est terminée
+        # --- quand la mise en place des cartes communes est terminée ---
         if self.active_turn == 'board_generation' and self.board_generation_done and self.board_generation_anim_done :
-            self.active_turn = 'player'
-            self.board_generation_done = False
-            self.board_generation_anim_done = False
+            self.board_generation_end()
 
-        # quand le tour du joueur est terminé
-        if self.active_turn == 'player' and self.player_turn_done :
-            self.player_turn_done = False
-            self.active_player_indice += 1
-            if self.active_player_indice >= len(self.players) :
-                self.active_player_indice = 0
-                if not self.river_done :
-                    self.active_turn = 'board_generation'
-                    self.actual_animations.append('board_generation')
-            if self.players[self.active_player_indice].type == 'bot' : 
-                self.players[self.active_player_indice].beginning_turn_time = pygame.time.get_ticks()
-                
+        # --- quand le tour du joueur est terminé ---
+        if self.active_turn == 'player' and self.player_turn_done : 
+            self.player_turn_end()
+            
+        # --- quand le pot doit être distribué ---
+        if self.active_turn == 'chip_distribution' and self.chip_distribution_done and self.chip_distribution_anim_done :
+            self.turn_reset()
+            
     
     def update_and_draw_flop_animation(self, dt) :
         if self.animations_infos['board_generation']['card1_pos'][1] < self.animations_infos['board_generation']['card1_final_pos'][1] :

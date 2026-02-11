@@ -196,6 +196,7 @@ class Player :
         table.pot += self.chip_number
         self.chip_number = 0
         table.player_turn_done = True
+        table.round_players.remove(self)
 
 
     def action_check(self, table) :
@@ -203,12 +204,19 @@ class Player :
 
 
     def action_call(self, table) :
-        table.player_turn_done = True
-        table.pot += table.max_bet
-        self.chip_number -= table.max_bet
+        if self not in table.players_who_can_receive_chips :
+            table.players_who_can_receive_chips.append(self)
+        if self.chip_number >= table.max_bet :
+            table.player_turn_done = True
+            table.pot += table.max_bet
+            self.chip_number -= table.max_bet
+        else :
+            self.all_in(table)
 
 
     def action_bet(self, table) :
+        if self not in table.players_who_can_receive_chips :
+            table.players_who_can_receive_chips.append(self)
         if self.chip_number >= table.max_bet :
             self.placing_a_bet = True
         else :
@@ -216,6 +224,8 @@ class Player :
 
 
     def action_raise(self, table) :
+        if self not in table.players_who_can_receive_chips :
+            table.players_who_can_receive_chips.append(self)
         if self.chip_number > table.max_bet :
             self.placing_a_bet = True
         else :
@@ -223,8 +233,10 @@ class Player :
 
 
     def action_fold(self, table) :
+        if self in table.players_who_can_receive_chips :
+            table.players_who_can_receive_chips.remove(self)
         table.player_turn_done = True
-        table.players.remove(self)
+        table.round_players.remove(self)
         table.active_player_indice -= 1
     
     

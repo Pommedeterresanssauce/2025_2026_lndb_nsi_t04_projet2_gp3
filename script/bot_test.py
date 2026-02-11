@@ -35,7 +35,7 @@ class BotTest :
 
     def action_fold(self, table) :
         table.player_turn_done = True
-        table.players.remove(self)
+        table.round_players.remove(self)
         table.active_player_indice -= 1
         print('fold')
     
