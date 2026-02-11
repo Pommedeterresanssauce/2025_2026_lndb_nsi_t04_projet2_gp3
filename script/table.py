@@ -86,12 +86,13 @@ class Table :
 
         # --- ANIMATIONS ---
         self.animations = {
-            'shuffle' : import_folder('graphics/animations/shuffle'),
-            'win' : import_folder('graphics/animations/win'),
-            'lose' : import_folder('graphics/animations/lose')
+            'shuffle' : import_folder('graphics/animations/shuffle', 4),
+            'win' : import_folder('graphics/animations/win', 1.5),
+            'lose' : import_folder('graphics/animations/lose', 1.5)
         }
 
         self.actual_animations = []
+        self.actual_transition = None
 
         self.animations_infos = {
             # shuffle anim infos
@@ -102,13 +103,13 @@ class Table :
             },
             # win anim
             'win' : {
-                'pos' : (0, 0),
+                'pos' : (1380, 350),
                 'index' : 0,
                 'speed' : 6
             },
             # lose anim
             'lose' : {
-                'pos' : (0, 0),
+                'pos' : (1450, 450),
                 'index' : 0,
                 'speed' : 6
             },
@@ -138,7 +139,6 @@ class Table :
     def shuffle_deck(self) :
         random.shuffle(self.deck_cards)
         self.shuffle_done = True
-        # print(self.deck_cards)
 
 
     def distribute_cards(self) :
@@ -224,9 +224,9 @@ class Table :
         for player in self.players[:]:
             if player.chip_number <= 0:
                 self.players.remove(player)
+        # self.actual_animations.append('lose')
         self.actual_animations.append('win')
         self.chip_distribution_done = True
-        print('okk')
 
 
     def turn_reset(self) :
@@ -271,13 +271,13 @@ class Table :
             },
             # win anim
             'win' : {
-                'pos' : (0, 0),
+                'pos' : (1380, 350),
                 'index' : 0,
                 'speed' : 6
             },
             # lose anim
             'lose' : {
-                'pos' : (0, 0),
+                'pos' : (1450, 450),
                 'index' : 0,
                 'speed' : 6
             },
@@ -557,8 +557,8 @@ class Table :
 
     def draw_chip_infos(self) :
         # rects
-        pygame.draw.rect(self.screen, (46, 82, 58), (635, 1, 618, 142))
-        pygame.draw.rect(self.screen, (104, 157, 113), (640, 6, 608, 132))
+        pygame.draw.rect(self.screen, (46, 82, 58), (635, 1, 638, 142))
+        pygame.draw.rect(self.screen, (104, 157, 113), (640, 6, 628, 132))
         
         # infos
         pot_text = f'POT : {self.pot}'
