@@ -5,6 +5,7 @@ import random
 from bot_test import *
 from combinations import *
 from transition import *
+from combinations_test import *
 
 
 class Table :
@@ -183,52 +184,41 @@ class Table :
 
 
     def chip_distribution(self) :
-        # from combinations import combinations
 
-        # # Sécurité si personne n'est éligible
-        # if not self.players_who_can_receive_chips:
-        #     self.chip_distribution_done = True
-        #     return
+        if not self.players_who_can_receive_chips :
+            self.chip_distribution_done = True
+            return
 
-        # # 1. Trouver le meilleur score parmi les joueurs éligibles
-        # best_score = -1
-        # winners = []
+        best_score = None
+        winners = []
 
-        # for player in self.players_who_can_receive_chips:
-        #     # On évalue la main du joueur avec les cartes sur la table
-        #     score = combinations(player.hand, self.board)
-            
-        #     if score > best_score:
-        #         best_score = score
-        #         winners = [player]
-        #     elif score == best_score:
-        #         winners.append(player)
+        for player in self.players_who_can_receive_chips :
+            score = combinations(player.hand, self.board)
 
-        # # 2. Distribuer le pot
-        # if winners:
-        #     gain_per_winner = self.pot // len(winners)
-        #     for winner in winners:
-        #         winner.chip_number += gain_per_winner
-                
-        #         # Gestion des animations selon le type du gagnant
-        #         if winner.type == 'player':
-        #             if 'win' not in self.actual_animations:
-        #                 self.actual_animations.append('win')
-        #         else: # C'est un bot
-        #             if 'lose' not in self.actual_animations:
-        #                 self.actual_animations.append('lose')
+            if best_score is None or score > best_score :
+                best_score = score
+                winners = [player]
+            elif score == best_score :  
+                winners.append(player)
 
-        # # 3. Nettoyage et élimination des joueurs sans jetons
-        # self.pot = 0
-        # self.chip_distribution_done = True
-        
-        # On utilise une copie [:] pour pouvoir supprimer des éléments en itérant
-        for player in self.players[:]:
-            if player.chip_number <= 0:
-                self.players.remove(player)
-        # self.actual_animations.append('lose')
-        self.actual_animations.append('win')
+        if winners:
+            gain = self.pot // len(winners)
+
+            for winner in winners :
+                winner.chip_number += gain
+
+                if winner.type == 'player':
+                    if 'win' not in self.actual_animations:
+                        self.actual_animations.append('win')
+                else:
+                    if 'lose' not in self.actual_animations:
+                        self.actual_animations.append('lose')
+
+        self.pot = 0
         self.chip_distribution_done = True
+        for player in self.players :
+            if player.chip_number <= 0 :
+                self.players.remove(player)
 
 
     def turn_reset(self) :
