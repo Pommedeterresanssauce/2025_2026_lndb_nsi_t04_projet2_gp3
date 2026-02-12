@@ -6,6 +6,7 @@ from bot_test import *
 from combinations import *
 from transition import *
 from combinations_test import *
+from victory_screen import *
 
 
 class Table :
@@ -97,6 +98,10 @@ class Table :
         self.actual_animations = []
         self.actual_transition = None
         self.transition_in_progress = False
+        
+        # --- VICTORY SCREEN ---
+        self.game_over = False
+        self.victory_screen = None
 
         self.animations_infos = {
             # shuffle anim infos
@@ -138,6 +143,19 @@ class Table :
                 'card5_final_pos' : (977.5, 657),
             },
         }
+
+
+    def check_game_over(self):
+        """
+        Vérifie si la partie est terminée (un seul joueur avec des jetons).
+        Retourne le joueur gagnant s'il y en a un, sinon None.
+        """
+        players_with_chips = [player for player in self.players if player.chip_number > 0]
+        
+        if len(players_with_chips) == 1:
+            return players_with_chips[0]
+        
+        return None
 
 
     def shuffle_deck(self) :
@@ -223,6 +241,13 @@ class Table :
 
 
     def turn_reset(self) :
+        # Vérifier si la partie est terminée
+        winner = self.check_game_over()
+        if winner is not None:
+            self.game_over = True
+            self.victory_screen = VictoryScreen(self.screen, winner)
+            return
+        
         # reset des phase d'un tour de jeu
         self.active_turn = 'shuffle'
         self.shuffle_done = False 
@@ -573,6 +598,11 @@ class Table :
 
 
     def update(self, dt) :
+        # Si la partie est terminée, afficher l'écran de victoire
+        if self.game_over and self.victory_screen is not None:
+            self.victory_screen.update()
+            return
+        
         self.update_turn_phase(dt)
         self.draw()
         self.draw_board()   

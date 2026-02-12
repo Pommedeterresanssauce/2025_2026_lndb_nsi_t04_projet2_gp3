@@ -10,8 +10,8 @@ import random
 from probability import *
 import pygame
 
-class BotTest:
-    def __init__(self, image_path, draw_pos):
+class BotTest :
+    def __init__(self, image_path, draw_pos) :
         self.type = 'bot'
         self.hand = []
         self.chip_number = 2000
@@ -24,83 +24,79 @@ class BotTest:
         self.font = pygame.font.Font('graphics/ui/font.ttf', 40)
         
 
-    def draw_image(self, screen):
+    def draw_image(self, screen) :
         screen.blit(self.image, self.draw_pos)
         text_surface = self.font.render(str(self.chip_number), True, (255, 255, 255))
         screen.blit(text_surface, (self.draw_pos[0] + 30, self.draw_pos[1] + 210))
         
 
-    def draw_action_name(self, screen):
-        if self.futur_action:
+    def draw_action_name(self, screen) :
+        if self.futur_action :
             text_surface = self.font.render(self.futur_action, True, (255, 255, 255))
             screen.blit(text_surface, (self.draw_pos[0] + 35, self.draw_pos[1] + 275))
 
 
-    def all_in(self, table):
+    def all_in(self, table) :
         table.pot += self.chip_number
         self.chip_number = 0
         table.player_turn_done = True
         table.round_players.remove(self)        
         
 
-    def action_check(self, table):
+    def action_check(self, table) :
         table.player_turn_done = True
 
 
-    def action_call(self, table):
-        if self not in table.players_who_can_receive_chips:
+    def action_call(self, table) :
+        if self not in table.players_who_can_receive_chips :
             table.players_who_can_receive_chips.append(self)
-        if self.chip_number >= table.max_bet:
+        if self.chip_number >= table.max_bet :
             table.player_turn_done = True
             table.pot += table.max_bet
             self.chip_number -= table.max_bet
-            if self.chip_number == 0:
+            if self.chip_number == 0 :
                 table.round_players.remove(self)
-        else:
+        else :
             self.all_in(table)
 
 
-    def action_bet(self, table, bet_value):
-        if self not in table.players_who_can_receive_chips:
+    def action_bet(self, table, bet_value) :
+        if self not in table.players_who_can_receive_chips :
             table.players_who_can_receive_chips.append(self)
-        if self.chip_number >= bet_value:
+        if self.chip_number >= bet_value :
             table.max_bet = bet_value
             table.pot += bet_value
             self.chip_number -= bet_value
             table.player_turn_done = True
-            if self.chip_number == 0:
+            if self.chip_number == 0 :
                 table.round_players.remove(self)
-        else:
+        else :
             self.all_in(table)
 
 
-    def action_raise(self, table, bet_value):
-        if self not in table.players_who_can_receive_chips:
+    def action_raise(self, table, bet_value) :
+        if self not in table.players_who_can_receive_chips :
             table.players_who_can_receive_chips.append(self)
-        if self.chip_number >= bet_value:
+        if self.chip_number >= bet_value :
             table.pot += bet_value
             self.chip_number -= bet_value
             table.max_bet = bet_value
             table.player_turn_done = True
-            if self.chip_number == 0:
+            if self.chip_number == 0 :
                 table.round_players.remove(self)
-        else:
+        else :
             self.all_in(table)
 
 
-    def action_fold(self, table):
-        if self in table.players_who_can_receive_chips:
+    def action_fold(self, table) :
+        if self in table.players_who_can_receive_chips :
             table.players_who_can_receive_chips.remove(self)
         table.player_turn_done = True
         table.round_players.remove(self)
         table.active_player_indice -= 1
     
     
-    def decide_action(self, possible_actions, table):
-        """
-        Décide de l'action à effectuer en fonction de la main et des probabilités.
-        Le bot est maintenant plus agressif et fold rarement.
-        """
+    def decide_action(self, possible_actions, table) :
         # Facteur de bluff aléatoire (1-10) - plus le chiffre est élevé, plus le bot bluffe
         bluff_factor = randint(1, 10)
         
@@ -125,238 +121,238 @@ class BotTest:
         # --- STRATÉGIE EN FONCTION DE LA WIN PROBABILITY ---
         
         # Excellente main (80%+ de chances de gagner)
-        if win_proba >= 0.8:
-            if 'Bet' in possible_actions:
+        if win_proba >= 0.8 :
+            if 'Bet' in possible_actions :
                 # Mise très agressive
-                if self.chip_number > 500:
+                if self.chip_number > 500 :
                     self.futur_bet = randint(300, min(self.chip_number, 1000))
-                elif self.chip_number > 100:
+                elif self.chip_number > 100 :
                     self.futur_bet = randint(100, self.chip_number)
-                else:
+                else :
                     self.futur_bet = self.chip_number
                 self.futur_action = 'Bet'
                 
-            elif 'Raise' in possible_actions:
+            elif 'Raise' in possible_actions :
                 # Relance très agressive
                 min_raise = table.max_bet + 100
-                if self.chip_number > min_raise:
+                if self.chip_number > min_raise :
                     self.futur_bet = randint(min_raise, min(self.chip_number, table.max_bet * 3))
-                else:
+                else :
                     self.futur_bet = self.chip_number
                 self.futur_action = 'Raise'
                 
-            elif 'Call' in possible_actions:
+            elif 'Call' in possible_actions :
                 # On suit toujours avec une excellente main
                 self.futur_action = 'Call'
                 
-            else:  # Check disponible
+            else :  # Check disponible
                 self.futur_action = 'Check'
         
         # Très bonne main (60%-80% de chances de gagner)
-        elif win_proba >= 0.6:
-            if 'Bet' in possible_actions:
+        elif win_proba >= 0.6 :
+            if 'Bet' in possible_actions :
                 # Mise agressive
-                if self.chip_number > 500:
+                if self.chip_number > 500 :
                     self.futur_bet = randint(200, min(self.chip_number, 700))
-                elif self.chip_number > 100:
+                elif self.chip_number > 100 :
                     self.futur_bet = randint(100, self.chip_number)
-                else:
+                else :
                     self.futur_bet = self.chip_number
                 self.futur_action = 'Bet'
                 
-            elif 'Raise' in possible_actions:
+            elif 'Raise' in possible_actions :
                 # Relance agressive (70% du temps)
-                if bluff_factor > 3:
+                if bluff_factor > 3 :
                     min_raise = table.max_bet + 50
-                    if self.chip_number > min_raise:
+                    if self.chip_number > min_raise :
                         self.futur_bet = randint(min_raise, min(self.chip_number, table.max_bet * 2))
                         self.futur_action = 'Raise'
-                    else:
+                    else :
                         self.futur_action = 'Call' if 'Call' in possible_actions else 'Check'
-                else:
+                else :
                     self.futur_action = 'Call' if 'Call' in possible_actions else 'Check'
                     
-            elif 'Call' in possible_actions:
+            elif 'Call' in possible_actions :
                 # On suit presque toujours
                 self.futur_action = 'Call'
                 
-            else:  # Check disponible
+            else :  # Check disponible
                 self.futur_action = 'Check'
         
         # Bonne main (40%-60% de chances de gagner)
-        elif win_proba >= 0.4:
-            if 'Bet' in possible_actions:
+        elif win_proba >= 0.4 :
+            if 'Bet' in possible_actions :
                 # Mise modérée avec bluff fréquent (60% du temps)
-                if bluff_factor > 4:
-                    if self.chip_number > 300:
+                if bluff_factor > 4 :
+                    if self.chip_number > 300 :
                         self.futur_bet = randint(150, 400)
-                    else:
+                    else :
                         self.futur_bet = min(100, self.chip_number)
                     self.futur_action = 'Bet'
-                else:
+                else :
                     self.futur_action = 'Check'
                     
-            elif 'Raise' in possible_actions:
+            elif 'Raise' in possible_actions :
                 # Call ou parfois raise
-                if bluff_factor > 7:  # 30% de relance
+                if bluff_factor > 7 :  # 30% de relance
                     min_raise = table.max_bet + 50
-                    if self.chip_number > min_raise * 2:
+                    if self.chip_number > min_raise * 2 :
                         self.futur_bet = min_raise
                         self.futur_action = 'Raise'
-                    else:
+                    else :
                         self.futur_action = 'Call' if 'Call' in possible_actions else 'Check'
-                else:
+                else :
                     self.futur_action = 'Call' if 'Call' in possible_actions else 'Check'
                     
-            elif 'Call' in possible_actions:
+            elif 'Call' in possible_actions :
                 # On suit si la mise n'est pas trop grosse (< 50% du stack)
-                if bet_ratio < 0.5:
+                if bet_ratio < 0.5 :
                     self.futur_action = 'Call'
-                else:
+                else :
                     # Fold seulement si la mise est énorme
                     self.futur_action = 'Fold'
                     
-            else:  # Check disponible
+            else :  # Check disponible
                 self.futur_action = 'Check'
         
         # Main moyenne (25%-40% de chances de gagner)
-        elif win_proba >= 0.25:
-            if 'Bet' in possible_actions:
+        elif win_proba >= 0.25 :
+            if 'Bet' in possible_actions :
                 # Bluff fréquent (50% du temps)
-                if bluff_factor > 5:
+                if bluff_factor > 5 :
                     self.futur_bet = min(200, self.chip_number // 3)
                     self.futur_action = 'Bet'
-                else:
+                else :
                     self.futur_action = 'Check'
                     
-            elif 'Raise' in possible_actions:
+            elif 'Raise' in possible_actions :
                 # Call presque toujours, fold rarement
-                if 'Call' in possible_actions:
-                    if bet_ratio < 0.6:  # Augmenté de 0.4 à 0.6
+                if 'Call' in possible_actions :
+                    if bet_ratio < 0.6 :  # Augmenté de 0.4 à 0.6
                         self.futur_action = 'Call'
-                    else:
+                    else :
                         # Bluff agressif même avec main moyenne (40%)
-                        if bluff_factor > 6:
+                        if bluff_factor > 6 :
                             self.futur_action = 'Call'
-                        else:
+                        else :
                             self.futur_action = 'Fold'
-                else:
+                else :
                     self.futur_action = 'Check'
                     
-            elif 'Call' in possible_actions:
+            elif 'Call' in possible_actions :
                 # On suit presque toujours (< 50% du stack)
-                if bet_ratio < 0.5:  # Augmenté de 0.3 à 0.5
+                if bet_ratio < 0.5 :  # Augmenté de 0.3 à 0.5
                     self.futur_action = 'Call'
-                else:
+                else :
                     # Bluff agressif (40%)
-                    if bluff_factor > 6:
+                    if bluff_factor > 6 :
                         self.futur_action = 'Call'
-                    else:
+                    else :
                         self.futur_action = 'Fold'
                     
-            else:  # Check disponible
+            else :  # Check disponible
                 self.futur_action = 'Check'
         
         # Main faible (10%-25% de chances de gagner)
-        elif win_proba >= 0.1:
-            if 'Bet' in possible_actions:
+        elif win_proba >= 0.1 :
+            if 'Bet' in possible_actions :
                 # Bluff assez fréquent (40% du temps)
-                if bluff_factor > 6:
+                if bluff_factor > 6 :
                     self.futur_bet = min(150, self.chip_number // 4)
                     self.futur_action = 'Bet'
-                else:
+                else :
                     self.futur_action = 'Check'
                     
-            elif 'Raise' in possible_actions:
+            elif 'Raise' in possible_actions :
                 # Call si mise raisonnable
-                if 'Call' in possible_actions:
-                    if bet_ratio < 0.4:  # Augmenté de 0.2 à 0.4
+                if 'Call' in possible_actions :
+                    if bet_ratio < 0.4 :  # Augmenté de 0.2 à 0.4
                         self.futur_action = 'Call'
-                    else:
+                    else :
                         # Bluff même avec main faible (30%)
-                        if bluff_factor > 7:
+                        if bluff_factor > 7 :
                             self.futur_action = 'Call'
-                        else:
+                        else :
                             self.futur_action = 'Fold'
-                else:
+                else :
                     self.futur_action = 'Check'
                     
-            elif 'Call' in possible_actions:
+            elif 'Call' in possible_actions :
                 # On suit si la mise est < 30% du stack
-                if bet_ratio < 0.3:  # Augmenté de 0.15 à 0.3
+                if bet_ratio < 0.3 :  # Augmenté de 0.15 à 0.3
                     self.futur_action = 'Call'
-                else:
+                else :
                     # Bluff (30%)
-                    if bluff_factor > 7:
+                    if bluff_factor > 7 :
                         self.futur_action = 'Call'
-                    else:
+                    else :
                         self.futur_action = 'Fold'
                     
-            else:  # Check disponible
+            else :  # Check disponible
                 self.futur_action = 'Check'
         
         # Main très faible (<10% de chances de gagner)
-        else:
-            if 'Bet' in possible_actions:
+        else :
+            if 'Bet' in possible_actions :
                 # Bluff assez fréquent (30% du temps)
-                if bluff_factor > 7:
+                if bluff_factor > 7 :
                     self.futur_bet = min(100, self.chip_number // 5)
                     self.futur_action = 'Bet'
-                else:
+                else :
                     self.futur_action = 'Check'
                     
-            elif 'Raise' in possible_actions:
+            elif 'Raise' in possible_actions :
                 # Call si mise faible ou bluff
-                if 'Call' in possible_actions:
-                    if bet_ratio < 0.25:  # Augmenté de 0.1 à 0.25
+                if 'Call' in possible_actions :
+                    if bet_ratio < 0.25 :  # Augmenté de 0.1 à 0.25
                         self.futur_action = 'Call'
-                    else:
+                    else :
                         # Bluff audacieux (25%)
-                        if bluff_factor > 7.5:
+                        if bluff_factor > 7.5 :
                             self.futur_action = 'Call'
-                        else:
+                        else :
                             self.futur_action = 'Fold'
-                else:
+                else :
                     self.futur_action = 'Check'
                     
-            elif 'Call' in possible_actions:
+            elif 'Call' in possible_actions :
                 # Call si mise < 20% du stack
-                if bet_ratio < 0.2:  # Augmenté de 0.1 à 0.2
+                if bet_ratio < 0.2 :  # Augmenté de 0.1 à 0.2
                     self.futur_action = 'Call'
-                else:
+                else :
                     # Bluff même avec main nulle (20%)
-                    if bluff_factor > 8:
+                    if bluff_factor > 8 :
                         self.futur_action = 'Call'
-                    else:
+                    else :
                         self.futur_action = 'Fold'
                     
-            else:  # Check disponible
+            else :  # Check disponible
                 self.futur_action = 'Check'
     
     
-    def update(self, screen, possible_actions, table):
+    def update(self, screen, possible_actions, table) :
         current_time = pygame.time.get_ticks()
         
         # Décider de l'action si ce n'est pas encore fait
-        if self.futur_action is None:
+        if self.futur_action is None :
             self.decide_action(possible_actions, table)
         
         # Exécuter l'action après 1 seconde
-        if current_time - self.beginning_turn_time >= 1000:
-            if self.futur_action == 'Bet': 
+        if current_time - self.beginning_turn_time >= 1000 :
+            if self.futur_action == 'Bet' : 
                 self.action_bet(table, self.futur_bet)
-            elif self.futur_action == 'Check':
+            elif self.futur_action == 'Check' :
                 self.action_check(table)
-            elif self.futur_action == 'Call':
+            elif self.futur_action == 'Call' :
                 self.action_call(table)
-            elif self.futur_action == 'Fold':
+            elif self.futur_action == 'Fold' :
                 self.action_fold(table)
-            elif self.futur_action == 'Raise':
+            elif self.futur_action == 'Raise' :
                 self.action_raise(table, self.futur_bet)
             
             # Réinitialiser pour le prochain tour
             self.futur_action = None
             self.futur_bet = 0
-        else:
+        else :
             # Afficher l'action prévue pendant le délai
             self.draw_action_name(screen)
