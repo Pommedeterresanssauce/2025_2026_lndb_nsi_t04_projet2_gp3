@@ -40,7 +40,12 @@ class BotTest :
         table.pot += self.chip_number
         self.chip_number = 0
         table.player_turn_done = True
-        table.round_players.remove(self)        
+        # Trouver l'indice du joueur actuel avant de le retirer
+        current_index = table.round_players.index(self)
+        table.round_players.remove(self)
+        # Ajuster l'indice du joueur actif si nécessaire
+        if current_index < table.active_player_indice :
+            table.active_player_indice -= 1        
         
 
     def action_check(self, table) :
@@ -55,7 +60,12 @@ class BotTest :
             table.pot += table.max_bet
             self.chip_number -= table.max_bet
             if self.chip_number == 0 :
+                # Trouver l'indice du joueur actuel avant de le retirer
+                current_index = table.round_players.index(self)
                 table.round_players.remove(self)
+                # Ajuster l'indice du joueur actif si nécessaire
+                if current_index < table.active_player_indice :
+                    table.active_player_indice -= 1
         else :
             self.all_in(table)
 
@@ -69,7 +79,12 @@ class BotTest :
             self.chip_number -= bet_value
             table.player_turn_done = True
             if self.chip_number == 0 :
+                # Trouver l'indice du joueur actuel avant de le retirer
+                current_index = table.round_players.index(self)
                 table.round_players.remove(self)
+                # Ajuster l'indice du joueur actif si nécessaire
+                if current_index < table.active_player_indice :
+                    table.active_player_indice -= 1
         else :
             self.all_in(table)
 
@@ -83,7 +98,12 @@ class BotTest :
             table.max_bet = bet_value
             table.player_turn_done = True
             if self.chip_number == 0 :
+                # Trouver l'indice du joueur actuel avant de le retirer
+                current_index = table.round_players.index(self)
                 table.round_players.remove(self)
+                # Ajuster l'indice du joueur actif si nécessaire
+                if current_index < table.active_player_indice :
+                    table.active_player_indice -= 1
         else :
             self.all_in(table)
 

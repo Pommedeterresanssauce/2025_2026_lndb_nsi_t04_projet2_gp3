@@ -196,7 +196,12 @@ class Player :
         table.pot += self.chip_number
         self.chip_number = 0
         table.player_turn_done = True
+        # Trouver l'indice du joueur actuel avant de le retirer
+        current_index = table.round_players.index(self)
         table.round_players.remove(self)
+        # Ajuster l'indice du joueur actif si nécessaire
+        if current_index < table.active_player_indice :
+            table.active_player_indice -= 1
 
 
     def action_check(self, table) :
@@ -211,7 +216,12 @@ class Player :
             table.pot += table.max_bet
             self.chip_number -= table.max_bet
             if self.chip_number == 0 :
+                # Trouver l'indice du joueur actuel avant de le retirer
+                current_index = table.round_players.index(self)
                 table.round_players.remove(self)
+                # Ajuster l'indice du joueur actif si nécessaire
+                if current_index < table.active_player_indice :
+                    table.active_player_indice -= 1
         else :
             self.all_in(table)
 
@@ -306,7 +316,12 @@ class Player :
             self.placing_a_bet = False
             self.bet_value = 0
             if self.chip_number == 0 :
+                # Trouver l'indice du joueur actuel avant de le retirer
+                current_index = table.round_players.index(self)
                 table.round_players.remove(self)
+                # Ajuster l'indice du joueur actif si nécessaire
+                if current_index < table.active_player_indice :
+                    table.active_player_indice -= 1
 
     
     def handle_action_input(self, possible_actions, table) :
