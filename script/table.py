@@ -229,10 +229,12 @@ class Table :
                 if winner.type == 'player' :
                     if 'win' not in self.actual_animations:
                         self.actual_animations.append('win')
+                        self.chip_distribution_anim_done = False
                         break
                 else :
                     if 'lose' not in self.actual_animations:
                         self.actual_animations.append('lose')
+                        self.chip_distribution_anim_done = False
 
         self.pot = 0
         self.chip_distribution_done = True
