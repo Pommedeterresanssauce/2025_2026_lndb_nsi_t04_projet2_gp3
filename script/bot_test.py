@@ -356,6 +356,7 @@ class BotTest :
         # Décider de l'action si ce n'est pas encore fait
         if self.futur_action is None :
             self.decide_action(possible_actions, table)
+            self.beginning_turn_time = pygame.time.get_ticks()
         
         # Exécuter l'action après 1 seconde
         if current_time - self.beginning_turn_time >= 1000 :

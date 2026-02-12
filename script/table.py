@@ -395,8 +395,8 @@ class Table :
                 self.player_turn_done = False
                     
                 # Pour les Bots
-                if self.round_players[self.active_player_indice].type == 'bot': 
-                    self.round_players[self.active_player_indice].beginning_turn_time = pygame.time.get_ticks()
+                # if self.round_players[self.active_player_indice].type == 'bot': 
+                #     self.round_players[self.active_player_indice].beginning_turn_time = pygame.time.get_ticks()
     
             
     def update_turn_phase(self, dt) :
