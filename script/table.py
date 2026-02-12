@@ -226,10 +226,11 @@ class Table :
             for winner in winners :
                 winner.chip_number += gain
 
-                if winner.type == 'player':
+                if winner.type == 'player' :
                     if 'win' not in self.actual_animations:
                         self.actual_animations.append('win')
-                else:
+                        break
+                else :
                     if 'lose' not in self.actual_animations:
                         self.actual_animations.append('lose')
 
@@ -421,7 +422,7 @@ class Table :
             
         # --- quand le pot doit être distribué ---
         if self.active_turn == 'chip_distribution' and self.chip_distribution_done and self.chip_distribution_anim_done :
-            # self.turn_reset()
+
             if self.actual_transition == None :
                 def transition_action() :
                     self.turn_reset()
